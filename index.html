@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
-  <title>do u (F)Wme?</title>
+  <title>fwme</title>
 
   <!-- Open Graph -->
   <meta property="og:title" content="do u (F)Wme?" />
@@ -20,22 +19,42 @@
       margin: 0;
       height: 100vh;
       background: #000;
-      color: #fff;
+      color: #eaeaea;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 20px;
+      font-family: "Courier New", monospace;
+      font-size: 18px;
       letter-spacing: 1px;
     }
 
     .container {
       text-align: center;
       width: 260px;
+      user-select: none;
     }
 
     .text {
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    /* glitch ultra sutil */
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 1px;
+      top: 0;
+      opacity: 0.2;
+      animation: glitch 2.8s infinite;
+    }
+
+    @keyframes glitch {
+      0% { opacity: 0; }
+      92% { opacity: 0; }
+      94% { opacity: 0.25; }
+      96% { opacity: 0; }
+      100% { opacity: 0; }
     }
 
     .dots::after {
@@ -53,8 +72,8 @@
     .bar {
       width: 100%;
       height: 6px;
-      border: 1px solid #fff;
-      margin-top: 12px;
+      border: 1px solid #eaeaea;
+      margin-top: 14px;
       position: relative;
       overflow: hidden;
     }
@@ -62,30 +81,102 @@
     .bar-fill {
       height: 100%;
       width: 0%;
-      background: #fff;
-      animation: loading 3.5s linear forwards;
+      background: #eaeaea;
+      transition: width 0.15s linear;
     }
 
-    @keyframes loading {
-      from { width: 0%; }
-      to { width: 100%; }
+    /* easter egg */
+    .secret {
+      margin-top: 14px;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      position: relative;
+    }
+
+    .secret.glitch-once::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 1px;
+      top: 0;
+      opacity: 0.35;
+      animation: secretGlitch 0.4s linear 1;
+    }
+
+    @keyframes secretGlitch {
+      0% { opacity: 0; }
+      30% { opacity: 0.35; }
+      60% { opacity: 0.15; }
+      100% { opacity: 0; }
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <div class="text">do u (F)Wme?</div>
-    <div class="dots">loading</div>
+    <div class="text glitch" data-text="do u (F)Wme?">do u (F)Wme?</div>
+    <div class="dots" id="status">loading</div>
+
     <div class="bar">
-      <div class="bar-fill"></div>
+      <div class="bar-fill" id="bar"></div>
     </div>
+
+    <div class="secret" id="secret" data-text="Dn’t(F)Wme">Dn’t(F)Wme</div>
   </div>
 
   <script>
+    const bar = document.getElementById("bar");
+    const status = document.getElementById("status");
+    const secret = document.getElementById("secret");
+
+    const messages = [
+      "loading",
+      "tuning frequency",
+      "finding fwme",
+      "almost there"
+    ];
+
+    let progress = 0;
+    let index = 0;
+
+    const interval = setInterval(() => {
+      if (progress < 90) {
+        progress += Math.random() * 8;
+        bar.style.width = progress + "%";
+
+        status.textContent = messages[index % messages.length];
+        document.title = messages[index % messages.length];
+        index++;
+      }
+    }, 400);
+
     setTimeout(() => {
-      window.location.href = "https://open.spotify.com/playlist/6Z5EsoedIB4Cgxwv3epoIq";
-    }, 3500);
+      clearInterval(interval);
+
+      setTimeout(() => {
+        bar.style.width = "100%";
+        status.textContent = "ready";
+        document.title = "fwme";
+
+        setTimeout(() => {
+          window.location.href =
+            "https://open.spotify.com/playlist/6Z5EsoedIB4Cgxwv3epoIq";
+        }, 600);
+      }, 600);
+    }, 3200);
+
+    /* easter egg: tap / click largo */
+    let pressTimer;
+    document.body.addEventListener("mousedown", () => {
+      pressTimer = setTimeout(() => {
+        secret.style.opacity = "1";
+        secret.classList.add("glitch-once");
+      }, 800);
+    });
+
+    document.body.addEventListener("mouseup", () => {
+      clearTimeout(pressTimer);
+    });
   </script>
 </body>
 </html>
