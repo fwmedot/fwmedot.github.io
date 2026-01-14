@@ -11,7 +11,6 @@
   <meta property="og:url" content="https://fwmedot.github.io" />
   <meta property="og:type" content="website" />
 
-  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
 
   <style>
@@ -83,6 +82,23 @@
       transition: width 0.15s linear;
     }
 
+    .choices {
+      margin-top: 16px;
+      display: none;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .choice {
+      cursor: pointer;
+      opacity: 0.85;
+    }
+
+    .choice:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
     .secret {
       margin-top: 14px;
       font-size: 12px;
@@ -107,7 +123,6 @@
       100% { opacity: 0; }
     }
 
-    /* visitas ocultas (debug) */
     .visits {
       font-size: 10px;
       opacity: 0.15;
@@ -125,35 +140,29 @@
       <div class="bar-fill" id="bar"></div>
     </div>
 
-    <div class="secret" id="secret" data-text="Dn’t(F)Wme">Dn’t(F)Wme</div>
+    <div class="choices" id="choices">
+      <div class="choice" onclick="openPlaylist('a')">→ fwme</div>
+      <div class="choice" onclick="openPlaylist('b')">→ dn’t fwme</div>
+    </div>
 
-    <!-- opcional: contador oculto -->
+    <div class="secret" id="secret" data-text="Dn’t(F)Wme">Dn’t(F)Wme</div>
     <div class="visits" id="visits"></div>
   </div>
 
   <script>
-    /* ===============================
-       ANALYTICS — COUNTAPI
-       =============================== */
-
     const COUNT_KEY = "fwmedot.github.io/fwme";
 
-    // suma visita
     fetch(`https://api.countapi.xyz/hit/${COUNT_KEY}`)
       .then(res => res.json())
       .then(data => {
-        console.log("Visitas totales:", data.value);
         document.getElementById("visits").textContent =
           `visits: ${data.value}`;
       })
       .catch(() => {});
 
-    /* ===============================
-       TU SCRIPT ORIGINAL
-       =============================== */
-
     const bar = document.getElementById("bar");
     const status = document.getElementById("status");
+    const choices = document.getElementById("choices");
     const secret = document.getElementById("secret");
 
     const messages = [
@@ -171,7 +180,6 @@
       if (progress < 90) {
         progress += Math.random() * 8;
         bar.style.width = progress + "%";
-
         status.textContent = messages[index % messages.length];
         document.title = messages[index % messages.length];
         index++;
@@ -180,23 +188,22 @@
 
     setTimeout(() => {
       clearInterval(interval);
-
-      setTimeout(() => {
-        bar.style.width = "100%";
-        status.textContent = "ready";
-        document.title = "fwme";
-
-        setTimeout(() => {
-          window.location.href =
-            "https://open.spotify.com/playlist/6Z5EsoedIB4Cgxwv3epoIq";
-        }, 600);
-      }, 600);
+      bar.style.width = "100%";
+      status.textContent = "choose";
+      document.title = "fwme";
+      choices.style.display = "block";
     }, 3200);
 
-    /* easter egg */
+    function openPlaylist(type) {
+      const playlists = {
+        a: "https://open.spotify.com/playlist/6Z5EsoedIB4Cgxwv3epoIq",
+        b: "https://open.spotify.com/playlist/69oj2W3LiWH9OsYRF3JFRs"
+      };
+      window.location.href = playlists[type];
+    }
+
     document.body.addEventListener("click", () => {
       if (revealed) return;
-
       secret.style.opacity = "1";
       secret.classList.add("glitch-once");
       revealed = true;
