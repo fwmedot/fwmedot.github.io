@@ -6,7 +6,7 @@
 
   <!-- Open Graph -->
   <meta property="og:title" content="do u (F)Wme?" />
-  <meta property="og:description" content="fwme playlist" />
+  <meta property="og:description" content="fwme ritual" />
   <meta property="og:image" content="https://fwmedot.github.io/IMG_1040.jpeg" />
   <meta property="og:url" content="https://fwmedot.github.io" />
   <meta property="og:type" content="website" />
@@ -25,6 +25,7 @@
       font-family: "Courier New", monospace;
       font-size: 18px;
       letter-spacing: 1px;
+      cursor: default;
     }
 
     .container {
@@ -44,20 +45,20 @@
       left: 1px;
       top: 0;
       opacity: 0.2;
-      animation: glitch 2.8s infinite;
+      animation: glitch 3s infinite;
     }
 
     @keyframes glitch {
       0% { opacity: 0; }
-      92% { opacity: 0; }
-      94% { opacity: 0.25; }
-      96% { opacity: 0; }
+      94% { opacity: 0; }
+      96% { opacity: 0.25; }
+      98% { opacity: 0; }
       100% { opacity: 0; }
     }
 
     .dots::after {
       content: "";
-      animation: dots 1.5s infinite;
+      animation: dots 1.6s infinite;
     }
 
     @keyframes dots {
@@ -79,11 +80,11 @@
       height: 100%;
       width: 0%;
       background: #eaeaea;
-      transition: width 0.15s linear;
+      transition: width 0.1s linear;
     }
 
     .choices {
-      margin-top: 16px;
+      margin-top: 18px;
       display: none;
       font-size: 14px;
       line-height: 1.8;
@@ -99,34 +100,10 @@
       text-decoration: underline;
     }
 
-    .secret {
-      margin-top: 14px;
-      font-size: 12px;
-      opacity: 0;
-      transition: opacity 0.6s ease;
-      position: relative;
-    }
-
-    .secret.glitch-once::after {
-      content: attr(data-text);
-      position: absolute;
-      left: 1px;
-      top: 0;
-      opacity: 0.35;
-      animation: secretGlitch 0.4s linear 1;
-    }
-
-    @keyframes secretGlitch {
-      0% { opacity: 0; }
-      30% { opacity: 0.35; }
-      60% { opacity: 0.15; }
-      100% { opacity: 0; }
-    }
-
     .visits {
       font-size: 10px;
       opacity: 0.15;
-      margin-top: 8px;
+      margin-top: 12px;
     }
   </style>
 </head>
@@ -134,7 +111,7 @@
 <body>
   <div class="container">
     <div class="text glitch" data-text="do u (F)Wme?">do u (F)Wme?</div>
-    <div class="dots" id="status">loading</div>
+    <div class="dots" id="status">waiting</div>
 
     <div class="bar">
       <div class="bar-fill" id="bar"></div>
@@ -145,9 +122,13 @@
       <div class="choice" onclick="openPlaylist('b')">→ dn’t fwme</div>
     </div>
 
-    <div class="secret" id="secret" data-text="Dn’t(F)Wme">Dn’t(F)Wme</div>
     <div class="visits" id="visits"></div>
   </div>
+
+  <!-- AUDIO DEL VIDEO (RAÍZ DEL REPO) -->
+  <audio id="ritualAudio" preload="auto">
+    <source src="january.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
     const COUNT_KEY = "fwmedot.github.io/fwme";
@@ -163,36 +144,22 @@
     const bar = document.getElementById("bar");
     const status = document.getElementById("status");
     const choices = document.getElementById("choices");
-    const secret = document.getElementById("secret");
+    const audio = document.getElementById("ritualAudio");
 
-    const messages = [
-      "loading",
-      "tuning frequency",
-      "finding fwme",
-      "almost there"
-    ];
+    let audioStarted = false;
 
-    let progress = 0;
-    let index = 0;
-    let revealed = false;
+    // sincroniza barra con duración real del audio
+    audio.addEventListener("timeupdate", () => {
+      if (!audio.duration) return;
+      const percent = (audio.currentTime / audio.duration) * 100;
+      bar.style.width = percent + "%";
+    });
 
-    const interval = setInterval(() => {
-      if (progress < 90) {
-        progress += Math.random() * 8;
-        bar.style.width = progress + "%";
-        status.textContent = messages[index % messages.length];
-        document.title = messages[index % messages.length];
-        index++;
-      }
-    }, 400);
-
-    setTimeout(() => {
-      clearInterval(interval);
+    audio.addEventListener("ended", () => {
       bar.style.width = "100%";
       status.textContent = "choose";
-      document.title = "fwme";
       choices.style.display = "block";
-    }, 3200);
+    });
 
     function openPlaylist(type) {
       const playlists = {
@@ -202,12 +169,14 @@
       window.location.href = playlists[type];
     }
 
+    // activar audio con primer toque (sin sonido de click)
     document.body.addEventListener("click", () => {
-      if (revealed) return;
-      secret.style.opacity = "1";
-      secret.classList.add("glitch-once");
-      revealed = true;
-    });
+      if (audioStarted) return;
+      audio.volume = 0.4;
+      audio.play().catch(() => {});
+      status.textContent = "listening";
+      audioStarted = true;
+    }, { once: true });
   </script>
 </body>
 </html>
