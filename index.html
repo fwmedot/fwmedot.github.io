@@ -67,6 +67,7 @@
       100% { content: "..."; }
     }
 
+    /* BARRA DE CARGA */
     .bar {
       width: 100%;
       height: 6px;
@@ -99,6 +100,7 @@
       text-decoration: underline;
     }
 
+    /* PLAYER */
     .player {
       margin-top: 26px;
       font-size: 12px;
@@ -122,18 +124,6 @@
       width: 0%;
       background: #eaeaea;
     }
-
-    .ack {
-      margin-top: 20px;
-      font-size: 11px;
-      opacity: 0.25;
-      cursor: pointer;
-      transition: opacity 0.3s ease;
-    }
-
-    .ack:hover {
-      opacity: 0.6;
-    }
   </style>
 </head>
 
@@ -142,27 +132,27 @@
     <div class="text glitch" data-text="do u (F)Wme?">do u (F)Wme?</div>
     <div class="dots" id="status">waiting</div>
 
+    <!-- BARRA DE CARGA -->
     <div class="bar">
       <div class="bar-fill" id="loadBar"></div>
     </div>
 
+    <!-- PLAYLISTS -->
     <div class="choices" id="choices">
       <div class="choice" onclick="openPlaylist('a')">→ fwme</div>
       <div class="choice" onclick="openPlaylist('b')">→ dn’t fwme</div>
     </div>
 
+    <!-- PLAYER -->
     <div class="player">
       <div class="play-btn" id="playBtn">▶ play</div>
       <div class="music-bar">
         <div class="music-fill" id="musicBar"></div>
       </div>
     </div>
-
-    <div class="ack" id="ack">
-      i was here · <span id="ackCount">0</span>
-    </div>
   </div>
 
+  <!-- AUDIO -->
   <audio id="ritualAudio" preload="auto">
     <source src="january.mp3" type="audio/mpeg">
   </audio>
@@ -174,10 +164,8 @@
     const choices = document.getElementById("choices");
     const audio = document.getElementById("ritualAudio");
     const playBtn = document.getElementById("playBtn");
-    const ack = document.getElementById("ack");
-    const ackCount = document.getElementById("ackCount");
 
-    /* CARGA */
+    /* BARRA DE CARGA (RITUAL) */
     let progress = 0;
     const loader = setInterval(() => {
       if (progress < 100) {
@@ -214,6 +202,7 @@
         (audio.currentTime / audio.duration) * 100 + "%";
     });
 
+    /* PLAYLISTS */
     function openPlaylist(type) {
       const playlists = {
         a: "https://open.spotify.com/playlist/6Z5EsoedIB4Cgxwv3epoIq",
@@ -221,30 +210,6 @@
       };
       window.location.href = playlists[type];
     }
-
-    /* ACK — INIT (CREA Y LEE SIN SUMAR) */
-    fetch("https://api.countapi.xyz/hit/fwmedot.github.io/ack?amount=0")
-      .then(res => res.json())
-      .then(data => {
-        ackCount.textContent = data.value;
-      })
-      .catch(() => {});
-
-    /* ACK — CLICK */
-    let acknowledged = false;
-
-    ack.addEventListener("click", () => {
-      if (acknowledged) return;
-
-      fetch("https://api.countapi.xyz/hit/fwmedot.github.io/ack")
-        .then(res => res.json())
-        .then(data => {
-          ackCount.textContent = data.value;
-        })
-        .catch(() => {});
-
-      acknowledged = true;
-    });
   </script>
 </body>
 </html>
