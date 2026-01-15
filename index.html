@@ -67,7 +67,7 @@
       100% { content: "..."; }
     }
 
-    /* BARRA DE CARGA (RITUAL) */
+    /* BARRA DE CARGA */
     .bar {
       width: 100%;
       height: 6px;
@@ -100,7 +100,7 @@
       text-decoration: underline;
     }
 
-    /* --- PLAYER --- */
+    /* PLAYER */
     .player {
       margin-top: 26px;
       font-size: 12px;
@@ -125,10 +125,17 @@
       background: #eaeaea;
     }
 
-    .visits {
-      font-size: 10px;
-      opacity: 0.15;
-      margin-top: 10px;
+    /* ACK */
+    .ack {
+      margin-top: 20px;
+      font-size: 11px;
+      opacity: 0.25;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+
+    .ack:hover {
+      opacity: 0.6;
     }
   </style>
 </head>
@@ -157,7 +164,8 @@
       </div>
     </div>
 
-    <div class="visits" id="visits"></div>
+    <!-- ACK -->
+    <div class="ack" id="ack">i was here · <span id="ackCount">0</span></div>
   </div>
 
   <!-- AUDIO -->
@@ -166,22 +174,17 @@
   </audio>
 
   <script>
-    /* VISITAS */
-    const COUNT_KEY = "fwmedot.github.io/fwme";
-    fetch(`https://api.countapi.xyz/hit/${COUNT_KEY}`)
-      .then(r => r.json())
-      .then(d => {
-        document.getElementById("visits").textContent = `visits: ${d.value}`;
-      });
-
+    /* ELEMENTS */
     const loadBar = document.getElementById("loadBar");
     const musicBar = document.getElementById("musicBar");
     const status = document.getElementById("status");
     const choices = document.getElementById("choices");
     const audio = document.getElementById("ritualAudio");
     const playBtn = document.getElementById("playBtn");
+    const ack = document.getElementById("ack");
+    const ackCount = document.getElementById("ackCount");
 
-    /* BARRA DE CARGA FAKE */
+    /* BARRA DE CARGA */
     let progress = 0;
     const loader = setInterval(() => {
       if (progress < 100) {
@@ -214,8 +217,8 @@
 
     audio.addEventListener("timeupdate", () => {
       if (!audio.duration) return;
-      const percent = (audio.currentTime / audio.duration) * 100;
-      musicBar.style.width = percent + "%";
+      musicBar.style.width =
+        (audio.currentTime / audio.duration) * 100 + "%";
     });
 
     /* PLAYLISTS */
@@ -226,6 +229,29 @@
       };
       window.location.href = playlists[type];
     }
+
+    /* ACK COUNT */
+    let acknowledged = false;
+
+    fetch("https://api.countapi.xyz/get/fwmedot.github.io/ack")
+      .then(res => res.json())
+      .then(data => {
+        ackCount.textContent = data.value || 0;
+      })
+      .catch(() => {});
+
+    ack.addEventListener("click", () => {
+      if (acknowledged) return;
+
+      fetch("https://api.countapi.xyz/hit/fwmedot.github.io/ack")
+        .then(res => res.json())
+        .then(data => {
+          ackCount.textContent = data.value;
+        })
+        .catch(() => {});
+
+      acknowledged = true;
+    });
   </script>
 </body>
 </html>
