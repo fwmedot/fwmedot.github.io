@@ -25,7 +25,6 @@
       font-family: "Courier New", monospace;
       font-size: 18px;
       letter-spacing: 1px;
-      cursor: default;
     }
 
     .container {
@@ -68,6 +67,7 @@
       100% { content: "..."; }
     }
 
+    /* BARRA DE CARGA (RITUAL) */
     .bar {
       width: 100%;
       height: 6px;
@@ -80,7 +80,7 @@
       height: 100%;
       width: 0%;
       background: #eaeaea;
-      transition: width 0.1s linear;
+      transition: width 0.15s linear;
     }
 
     .choices {
@@ -100,10 +100,35 @@
       text-decoration: underline;
     }
 
+    /* --- PLAYER --- */
+    .player {
+      margin-top: 26px;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .play-btn {
+      cursor: pointer;
+      margin-bottom: 6px;
+    }
+
+    .music-bar {
+      width: 100%;
+      height: 3px;
+      border: 1px solid #444;
+      overflow: hidden;
+    }
+
+    .music-fill {
+      height: 100%;
+      width: 0%;
+      background: #eaeaea;
+    }
+
     .visits {
       font-size: 10px;
       opacity: 0.15;
-      margin-top: 12px;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -113,54 +138,87 @@
     <div class="text glitch" data-text="do u (F)Wme?">do u (F)Wme?</div>
     <div class="dots" id="status">waiting</div>
 
+    <!-- BARRA DE CARGA -->
     <div class="bar">
-      <div class="bar-fill" id="bar"></div>
+      <div class="bar-fill" id="loadBar"></div>
     </div>
 
+    <!-- PLAYLISTS -->
     <div class="choices" id="choices">
       <div class="choice" onclick="openPlaylist('a')">→ fwme</div>
       <div class="choice" onclick="openPlaylist('b')">→ dn’t fwme</div>
     </div>
 
+    <!-- PLAYER -->
+    <div class="player">
+      <div class="play-btn" id="playBtn">▶ play</div>
+      <div class="music-bar">
+        <div class="music-fill" id="musicBar"></div>
+      </div>
+    </div>
+
     <div class="visits" id="visits"></div>
   </div>
 
-  <!-- AUDIO DEL VIDEO (RAÍZ DEL REPO) -->
+  <!-- AUDIO -->
   <audio id="ritualAudio" preload="auto">
     <source src="january.mp3" type="audio/mpeg">
   </audio>
 
   <script>
+    /* VISITAS */
     const COUNT_KEY = "fwmedot.github.io/fwme";
-
     fetch(`https://api.countapi.xyz/hit/${COUNT_KEY}`)
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("visits").textContent =
-          `visits: ${data.value}`;
-      })
-      .catch(() => {});
+      .then(r => r.json())
+      .then(d => {
+        document.getElementById("visits").textContent = `visits: ${d.value}`;
+      });
 
-    const bar = document.getElementById("bar");
+    const loadBar = document.getElementById("loadBar");
+    const musicBar = document.getElementById("musicBar");
     const status = document.getElementById("status");
     const choices = document.getElementById("choices");
     const audio = document.getElementById("ritualAudio");
+    const playBtn = document.getElementById("playBtn");
 
-    let audioStarted = false;
+    /* BARRA DE CARGA FAKE */
+    let progress = 0;
+    const loader = setInterval(() => {
+      if (progress < 100) {
+        progress += Math.random() * 8;
+        loadBar.style.width = Math.min(progress, 100) + "%";
+      }
+    }, 400);
 
-    // sincroniza barra con duración real del audio
+    setTimeout(() => {
+      clearInterval(loader);
+      loadBar.style.width = "100%";
+      status.textContent = "ready";
+      choices.style.display = "block";
+    }, 3200);
+
+    /* PLAYER */
+    let playing = false;
+
+    playBtn.addEventListener("click", () => {
+      if (!playing) {
+        audio.play();
+        playBtn.textContent = "⏸ pause";
+        playing = true;
+      } else {
+        audio.pause();
+        playBtn.textContent = "▶ play";
+        playing = false;
+      }
+    });
+
     audio.addEventListener("timeupdate", () => {
       if (!audio.duration) return;
       const percent = (audio.currentTime / audio.duration) * 100;
-      bar.style.width = percent + "%";
+      musicBar.style.width = percent + "%";
     });
 
-    audio.addEventListener("ended", () => {
-      bar.style.width = "100%";
-      status.textContent = "choose";
-      choices.style.display = "block";
-    });
-
+    /* PLAYLISTS */
     function openPlaylist(type) {
       const playlists = {
         a: "https://open.spotify.com/playlist/6Z5EsoedIB4Cgxwv3epoIq",
@@ -168,15 +226,6 @@
       };
       window.location.href = playlists[type];
     }
-
-    // activar audio con primer toque (sin sonido de click)
-    document.body.addEventListener("click", () => {
-      if (audioStarted) return;
-      audio.volume = 0.4;
-      audio.play().catch(() => {});
-      status.textContent = "listening";
-      audioStarted = true;
-    }, { once: true });
   </script>
 </body>
 </html>
