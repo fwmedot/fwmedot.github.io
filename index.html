@@ -60,6 +60,17 @@
       text-decoration: underline;
     }
 
+    /* shop offline */
+    .item.offline {
+      opacity: 0.4;
+      cursor: default;
+      text-decoration: none;
+    }
+
+    .item.offline:hover {
+      text-decoration: none;
+    }
+
     .footer {
       position: fixed;
       bottom: 16px;
@@ -75,9 +86,28 @@
     <div class="title">blonded</div>
 
     <div class="list">
-      <a class="item" href="#">radio</a>
-      <a class="item" href="#">archive</a>
-      <a class="item" href="#">store</a>
+      <!-- RADIO -->
+      <a
+        class="item"
+        href="https://untitled.stream/library/project/3YZDnKcWCfHtuCcoIHUQp"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        radio
+      </a>
+
+      <!-- ARCHIVE -->
+      <a
+        class="item"
+        href="https://www.instagram.com/blondedloves.u?igsh=MW5zNzl0NHFidnUyMg=="
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        archive
+      </a>
+
+      <!-- SHOP (OFFLINE) -->
+      <span class="item offline">shop</span>
     </div>
   </div>
 
